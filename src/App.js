@@ -1,30 +1,34 @@
 
 import React from 'react';
-<<<<<<< HEAD
-=======
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import AddMovie from './pages/AddMovie';
 import { getFirestore,collection, } from 'firebase/firestore';
->>>>>>> zakaria
+import Login from "./pages/Login";
+import { UserProvider } from "./contexts/UserContext";
+import Navbar from "./components/Navbar";
+import MoviesList from "./components/MoviesList";
 
 
-<<<<<<< HEAD
-     
-    </>
-  );
-}
 
-export default App;
-=======
-export default function App() {
+
+
+    
+
+
+
+function App() {
 return (
-<Router>
-<Routes>
-<Route path="/" element={<Home />} />
-<Route path="/add" element={<AddMovie />} />
-</Routes>
-</Router>
+ <UserProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<MoviesList />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/add" element={<AddMovie />} />
+        </Routes>
+      </Router>
+    </UserProvider>
 );
 }
->>>>>>> zakaria
+export default App;

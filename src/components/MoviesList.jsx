@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import {
@@ -9,9 +9,11 @@ import {
   Grid,
   Button
 } from '@mui/material';
+import { UserContext } from '../contexts/UserContext'; // ⬅️ تمت الإضافة
 
 export default function MoviesList() {
   const [movies, setMovies] = useState([]);
+  const { user, loading } = useContext(UserContext); // ⬅️ تمت الإضافة
 
   useEffect(() => {
     const getMovies = async () => {
@@ -31,6 +33,8 @@ export default function MoviesList() {
     }
   };
 
+  if (loading) return <Typography>جاري التحميل...</Typography>; // ⬅️ لحين تحميل بيانات المستخدم
+
   return (
     <Grid container spacing={2}>
       {movies.map((movie) => (
@@ -49,7 +53,12 @@ export default function MoviesList() {
               <Typography variant="h6">{movie.title}</Typography>
               <Typography variant="body2">السنة: {movie.year}</Typography>
               <Typography variant="body2">التقييم: {movie.rating}</Typography>
-              <Button color="error" onClick={() => handleDelete(movie)}>🗑️ حذف</Button>
+
+              {user?.role === "admin" && (
+                <Button color="error" onClick={() => handleDelete(movie)}>
+                  🗑️ حذف
+                </Button>
+              )}
             </CardContent>
           </Card>
         </Grid>
