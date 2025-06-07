@@ -1,5 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  setDoc,
+  deleteField,
+  getDoc,
+  updateDoc
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import {
   Card,
@@ -7,21 +16,48 @@ import {
   CardMedia,
   Typography,
   Grid,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
-import { UserContext } from '../contexts/UserContext'; // ⬅️ تمت الإضافة
+import { Favorite, FavoriteBorder } from '@mui/icons-material';
+import { UserContext } from '../contexts/UserContext';
 
 export default function MoviesList() {
   const [movies, setMovies] = useState([]);
-  const { user, loading } = useContext(UserContext); // ⬅️ تمت الإضافة
+  const [favorites, setFavorites] = useState({});
+  const { user, loading } = useContext(UserContext);
 
   useEffect(() => {
-    const getMovies = async () => {
+    const fetchData = async () => {
       const snapshot = await getDocs(collection(db, 'movies'));
-      setMovies(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const moviesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setMovies(moviesData);
+
+      if (user) {
+        const favDoc = await getDoc(doc(db, 'userFavorites', user.uid));
+        if (favDoc.exists()) {
+          setFavorites(favDoc.data());
+        }
+      }
     };
-    getMovies();
-  }, []);
+
+    fetchData();
+  }, [user]);
+
+  const handleFavorite = async (movieId) => {
+    const favRef = doc(db, 'userFavorites', user.uid);
+    const updatedFavorites = { ...favorites };
+
+    if (favorites[movieId]) {
+      delete updatedFavorites[movieId];
+      await updateDoc(favRef, { [movieId]: deleteField() });
+    } else {
+      updatedFavorites[movieId] = true;
+      await setDoc(favRef, { [movieId]: true }, { merge: true });
+    }
+
+    setFavorites(updatedFavorites);
+  };
 
   const handleDelete = async (movie) => {
     try {
@@ -33,7 +69,7 @@ export default function MoviesList() {
     }
   };
 
-  if (loading) return <Typography>جاري التحميل...</Typography>; // ⬅️ لحين تحميل بيانات المستخدم
+  if (loading) return <Typography>جاري التحميل...</Typography>;
 
   return (
     <Grid container spacing={2}>
@@ -54,7 +90,13 @@ export default function MoviesList() {
               <Typography variant="body2">السنة: {movie.year}</Typography>
               <Typography variant="body2">التقييم: {movie.rating}</Typography>
 
-              {user?.role === "admin" && (
+              {user && (
+                <IconButton onClick={() => handleFavorite(movie.id)} color="secondary">
+                  {favorites[movie.id] ? <Favorite /> : <FavoriteBorder />}
+                </IconButton>
+              )}
+
+              {user?.role === 'admin' && (
                 <Button color="error" onClick={() => handleDelete(movie)}>
                   🗑️ حذف
                 </Button>

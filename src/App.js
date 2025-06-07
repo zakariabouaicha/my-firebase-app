@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import { UserProvider } from "./contexts/UserContext";
 import Navbar from "./components/Navbar";
 import MoviesList from "./components/MoviesList";
+import FavoritePage from './pages/FavoritePage';
 
 
 
@@ -26,6 +27,8 @@ return (
           <Route path="/" element={<MoviesList />} />
           <Route path="/login" element={<Login />} />
           <Route path="/add" element={<AddMovie />} />
+          <Route path="/favorites" element={<FavoritePage />} /> {/* ⬅️ مضافة */}
+
         </Routes>
       </Router>
     </UserProvider>

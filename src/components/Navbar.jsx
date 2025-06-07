@@ -14,7 +14,7 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  if (loading) return null; // أو يمكن عرض سبينر
+  if (loading) return null;
 
   return (
     <AppBar position="static">
@@ -23,7 +23,6 @@ export default function Navbar() {
           تطبيق الأفلام
         </Typography>
 
-        {/* زر عرض الأفلام للجميع */}
         <Button color="inherit" component={Link} to="/">
           عرض الأفلام
         </Button>
@@ -38,6 +37,9 @@ export default function Navbar() {
 
         {user && user.role === "user" && (
           <>
+            <Button color="inherit" component={Link} to="/favorites">
+              المفضلة
+            </Button>
             <Typography sx={{ mx: 2 }}>{user.email}</Typography>
             <Button color="inherit" onClick={handleLogout}>
               تسجيل خروج
