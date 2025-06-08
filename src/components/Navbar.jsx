@@ -1,9 +1,18 @@
 import React, { useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
-import { AppBar, Toolbar, Button, Typography } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  Typography,
+  Box,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
+import MovieIcon from '@mui/icons-material/Movie';
 
 export default function Navbar() {
   const { user, loading } = useContext(UserContext);
@@ -17,47 +26,54 @@ export default function Navbar() {
   if (loading) return null;
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          تطبيق الأفلام
-        </Typography>
+    <AppBar position="static" sx={{ bgcolor: "#1e1e1e" }}>
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        {/* القسم الأيسر: اسم التطبيق */}
+        <Box display="flex" alignItems="center">
+          <MovieIcon sx={{ mr: 1 }} />
+          <Typography variant="h6" component="div">
+            تطبيق الأفلام
+          </Typography>
+        </Box>
 
-        <Button color="inherit" component={Link} to="/">
-          عرض الأفلام
-        </Button>
+        {/* القسم الأوسط: الروابط العامة */}
+        <Box display="flex" gap={2}>
+          <Button color="inherit" component={Link} to="/">
+            عرض الأفلام
+          </Button>
 
-        {!user && (
-          <>
-            <Button color="inherit" component={Link} to="/login">
-              تسجيل الدخول
-            </Button>
-          </>
-        )}
-
-        {user && user.role === "user" && (
-          <>
+          {user && user.role === "user" && (
             <Button color="inherit" component={Link} to="/favorites">
               المفضلة
             </Button>
-            <Typography sx={{ mx: 2 }}>{user.email}</Typography>
-            <Button color="inherit" onClick={handleLogout}>
-              تسجيل خروج
-            </Button>
-          </>
-        )}
+          )}
 
-        {user && user.role === "admin" && (
-          <>
+          {user && user.role === "admin" && (
             <Button color="inherit" component={Link} to="/add">
               إضافة فيلم
             </Button>
-            <Typography sx={{ mx: 2 }}>{user.email}</Typography>
-            <Button color="inherit" onClick={handleLogout}>
-              تسجيل خروج
+          )}
+        </Box>
+
+        {/* القسم الأيمن: معلومات المستخدم وتسجيل الخروج */}
+        <Box display="flex" alignItems="center" gap={2}>
+          {user ? (
+            <>
+              <Tooltip title="البريد الإلكتروني">
+                <Typography variant="body2" color="inherit">
+                  {user.email}
+                </Typography>
+              </Tooltip>
+              <Button color="inherit" onClick={handleLogout}>
+                تسجيل خروج
+              </Button>
+            </>
+          ) : (
+            <Button color="inherit" component={Link} to="/login">
+              تسجيل الدخول
             </Button>
-          </>
-        )}
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );

@@ -17,9 +17,11 @@ import {
   Typography,
   Grid,
   Button,
-  IconButton
+  IconButton,
+  Box,
+  Tooltip
 } from '@mui/material';
-import { Favorite, FavoriteBorder } from '@mui/icons-material';
+import { Favorite, FavoriteBorder, Delete } from '@mui/icons-material';
 import { UserContext } from '../contexts/UserContext';
 
 export default function MoviesList() {
@@ -69,38 +71,63 @@ export default function MoviesList() {
     }
   };
 
-  if (loading) return <Typography>جاري التحميل...</Typography>;
+  if (loading) return <Typography align="center" mt={5}>جاري التحميل...</Typography>;
 
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={3} justifyContent="center" padding={2}>
       {movies.map((movie) => (
-        <Grid item xs={12} sm={6} md={4} key={movie.id}>
-          <Card>
+        <Grid item xs={12} sm={6} md={4} lg={3} key={movie.id}>
+          <Card
+            sx={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'transform 0.3s',
+              '&:hover': { transform: 'scale(1.02)' },
+              boxShadow: 4,
+              borderRadius: 3,
+            }}
+          >
             {movie.imageUrl && (
               <CardMedia
                 component="img"
-                height="200"
+                height="250"
                 image={movie.imageUrl}
                 alt={movie.title}
-                style={{ objectFit: 'cover' }}
+                sx={{ objectFit: 'cover' }}
               />
             )}
-            <CardContent>
-              <Typography variant="h6">{movie.title}</Typography>
-              <Typography variant="body2">السنة: {movie.year}</Typography>
-              <Typography variant="body2">التقييم: {movie.rating}</Typography>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Typography variant="h6" gutterBottom>{movie.title}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                السنة: {movie.year}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                التقييم: {movie.rating}
+              </Typography>
 
-              {user && (
-                <IconButton onClick={() => handleFavorite(movie.id)} color="secondary">
-                  {favorites[movie.id] ? <Favorite /> : <FavoriteBorder />}
-                </IconButton>
-              )}
+              <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+                {user && (
+                  <Tooltip title={favorites[movie.id] ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}>
+                    <IconButton onClick={() => handleFavorite(movie.id)} color="error">
+                      {favorites[movie.id] ? <Favorite /> : <FavoriteBorder />}
+                    </IconButton>
+                  </Tooltip>
+                )}
 
-              {user?.role === 'admin' && (
-                <Button color="error" onClick={() => handleDelete(movie)}>
-                  🗑️ حذف
-                </Button>
-              )}
+                {user?.role === 'admin' && (
+                  <Tooltip title="حذف الفيلم">
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      startIcon={<Delete />}
+                      onClick={() => handleDelete(movie)}
+                    >
+                      حذف
+                    </Button>
+                  </Tooltip>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
