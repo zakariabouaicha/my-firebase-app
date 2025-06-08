@@ -13,8 +13,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import MovieIcon from '@mui/icons-material/Movie';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-export default function Navbar() {
+export default function Navbar({ toggleDarkMode, darkMode }) {
   const { user, loading } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ export default function Navbar() {
   if (loading) return null;
 
   return (
-    <AppBar position="static" sx={{ bgcolor: "#1e1e1e" }}>
+    <AppBar position="static">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         {/* القسم الأيسر: اسم التطبيق */}
         <Box display="flex" alignItems="center">
@@ -55,8 +57,13 @@ export default function Navbar() {
           )}
         </Box>
 
-        {/* القسم الأيمن: معلومات المستخدم وتسجيل الخروج */}
+        {/* القسم الأيمن: الوضع الليلي + المستخدم */}
         <Box display="flex" alignItems="center" gap={2}>
+          {/* زر تبديل الوضع */}
+          <IconButton color="inherit" onClick={toggleDarkMode}>
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+
           {user ? (
             <>
               <Tooltip title="البريد الإلكتروني">
